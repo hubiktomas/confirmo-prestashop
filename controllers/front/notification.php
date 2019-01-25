@@ -5,7 +5,7 @@
  * NOTICE OF LICENSE
  *
  * This file is part of Confirmo PrestaShop module.
- * 
+ *
  * Confirmo PrestaShop module is free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the License,
@@ -36,14 +36,14 @@
 class ConfirmoNotificationModuleFrontController extends ModuleFrontController
 {
     /**
-	 * @see FrontController::initContent()
-	 */
+     * @see FrontController::initContent()
+     */
     public function initContent()
     {
         parent::initContent();
 
         // get the callback data
-        $callback = file_get_contents('php://input');
+        $callback = Tools::file_get_contents('php://input');
         // log all callbacks received for debugging purposes
         //$this->error("Callback received:", $callback, false);
         if (!$callback) {
@@ -106,11 +106,11 @@ class ConfirmoNotificationModuleFrontController extends ModuleFrontController
                 $this->error("Unknown callback status:", $callback);
                 die;
         }
-        
+
         // check if this cart has already been converted into an order
         if ($cart->orderExists()) {
             $order = new Order((int)OrderCore::getOrderByCartId($cart->id));
-            
+
             // if the order status is different from the current one, add order history
             if ($order->current_state != $orderStatus) {
                 $orderHistory = new OrderHistory();
@@ -143,7 +143,7 @@ class ConfirmoNotificationModuleFrontController extends ModuleFrontController
             }
             $this->module->validateOrder($cart->id, $orderStatus, $callbackData->invoice->amount, $payment_method, null, $extra, null, false, $customer->secure_key, $shop);
             $order = new Order($this->module->currentOrder);
-            
+
             // add Confirmo payment info to private order note for admin reference
             $messageLines = array(
                 $this->module->l('Payment Status') . ': ' . $this->module->getStatusDesc($callbackData->status, $callbackData->unhandledExceptions),
@@ -191,14 +191,14 @@ class ConfirmoNotificationModuleFrontController extends ModuleFrontController
                 $customer_message->add();
             }
         }
-        
+
         // we're done doing what we need to do, so make sure nothing else happens
         die;
     }
 
     /**
      * Writes an error message to /log/confirmo_errors.log and halts execution if not set otherwise.
-     * 
+     *
      * @param string $message error message
      * @param string $dataString callback string
      * @param bool $die halts the whole exection after writing to log if true

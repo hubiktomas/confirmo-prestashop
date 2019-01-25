@@ -5,7 +5,7 @@
  * NOTICE OF LICENSE
  *
  * This file is part of Confirmo PrestaShop module.
- * 
+ *
  * Confirmo PrestaShop module is free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the License,
@@ -54,8 +54,8 @@ class Confirmo extends PaymentModule
     );
 
     /**
-	 * @see Module::__construct()
-	 */
+     * @see Module::__construct()
+     */
     public function __construct()
     {
         $this->name = 'confirmo';
@@ -70,7 +70,7 @@ class Confirmo extends PaymentModule
         $this->currencies_mode = 'checkbox';
 
         $this->bootstrap = true;
-        
+
         parent::__construct();
 
         $this->displayName = $this->l("BitcoinPay Beta");
@@ -79,7 +79,7 @@ class Confirmo extends PaymentModule
         if (!$this->getConfigValue('API_KEY')) {
             $this->warning = $this->l("Account settings must be configured before using this module.");
         }
-        
+
         if (!count(Currency::checkPaymentCurrencies($this->id))) {
             $this->warning = $this->l("No currencies have been enabled for this module.");
         }
@@ -90,16 +90,15 @@ class Confirmo extends PaymentModule
     }
 
     /**
-	 * @see Module::install()
-	 */
+     * @see Module::install()
+     */
     public function install()
     {
         if (Shop::isFeatureActive()) {
             Shop::setContext(Shop::CONTEXT_ALL);
         }
 
-        if (
-            !parent::install()
+        if (!parent::install()
             // only for PrestaShop 1.6 and lower
             || (version_compare(_PS_VERSION_, '1.7', '<') && !$this->registerHook('payment'))
             // only for PrestaShop 1.7 and higher
@@ -119,12 +118,11 @@ class Confirmo extends PaymentModule
     }
 
     /**
-	 * @see Module::uninstall()
-	 */
+     * @see Module::uninstall()
+     */
     public function uninstall()
     {
-        if (
-            !parent::uninstall() ||
+        if (!parent::uninstall() ||
             !Configuration::deleteByName('CONFIRMO_API_KEY') ||
             !Configuration::deleteByName('CONFIRMO_CALLBACK_PASSWORD') ||
             !Configuration::deleteByName('CONFIRMO_PAYOUT_CURRENCY') ||
@@ -175,7 +173,7 @@ class Confirmo extends PaymentModule
             if ($fieldValues['CONFIRMO_PAYOUT_CURRENCY'] == "") {
                 $output .= $this->displayError($this->l("Payout Currency is required."));
             }
-            
+
             // check payout currency
             if (empty(unserialize($fieldValues['CONFIRMO_ACCEPTED_CRYPTOCURRENCIES']))) {
                 $output .= $this->displayError($this->l("Select at least one cryptocurrency to accept."));
@@ -187,7 +185,7 @@ class Confirmo extends PaymentModule
                     // get list of settlement currencies from the account
                     $this->apiKey = $fieldValues['CONFIRMO_API_KEY'];
                     $response = $this->apiRequest('currencies');
-                    
+
                     if (!$response->currencies || !is_array($response->currencies)) {
                         $errorMsg = $this->l("Error while retrieving settlement methods from you account.");
                         $output .= $this->displayError($errorMsg);
@@ -212,8 +210,7 @@ class Confirmo extends PaymentModule
                             }
                         }
                     }
-                }
-                catch (Exception $e) {
+                } catch (Exception $e) {
                     $output .= $this->displayError($e->getMessage());
                 }
             }
@@ -242,7 +239,7 @@ class Confirmo extends PaymentModule
      * Renders the settings form for the configuration page.
      *
      * @param bool $initial if the form should load initial values from the database (true) or not (false)
-     * 
+     *
      * @return string form html
      */
     public function renderSettingsForm($initial = true)
@@ -252,7 +249,7 @@ class Confirmo extends PaymentModule
 
         // get all order statuses to use for order status options
         $orderStatuses = OrderState::getOrderStates((int)$this->context->cookie->id_lang);
-        
+
         // form fields
         $formFields = array(
             array(
@@ -415,7 +412,7 @@ class Confirmo extends PaymentModule
                 )
             )
         );
-        
+
         // config fields for each supported cryptocurrency
         foreach($this->cryptoCurrencies as $currencyCode => $currencyName) {
             $formFields[0]['form']['input'][] = array(
@@ -464,7 +461,7 @@ class Confirmo extends PaymentModule
                 'href' => AdminController::$currentIndex . '&token=' . Tools::getAdminTokenLite('AdminModules')
             )
         );
-        
+
         $helper->tpl_vars = array(
             'fields_value' => $this->getConfigFieldValues($initial),
             'languages' => $this->context->controller->getLanguages(),
@@ -478,7 +475,7 @@ class Confirmo extends PaymentModule
      * Loads module config parameters values.
      *
      * @param bool $initial whether the config values should be loaded from the database (true) or from form POST data (false)
-     * 
+     *
      * @return array array of config values
      */
     public function getConfigFieldValues($initial = true)
@@ -496,7 +493,7 @@ class Confirmo extends PaymentModule
             'CONFIRMO_STATUS_ERROR' => $this->getConfigValue('STATUS_ERROR', true),
             'CONFIRMO_STATUS_REFUND' => $this->getConfigValue('STATUS_REFUND', true)*/
         );
-        
+
         if ($initial) {
             $configFieldValues['CONFIRMO_ACCEPTED_CRYPTOCURRENCIES'] = $this->getConfigValue('ACCEPTED_CRYPTOCURRENCIES');
             $acceptedCurrencies = unserialize($configFieldValues['CONFIRMO_ACCEPTED_CRYPTOCURRENCIES']);
@@ -513,13 +510,13 @@ class Confirmo extends PaymentModule
             }
             $configFieldValues['CONFIRMO_ACCEPTED_CRYPTOCURRENCIES'] = serialize($acceptedCurrencies);
         }
-        
+
         return $configFieldValues;
     }
 
     /**
      * Loads module default config parameters values.
-     * 
+     *
      * @return array array of module default config values
      */
     public function getDefaultValues()
@@ -539,19 +536,19 @@ class Confirmo extends PaymentModule
 
     /**
      * Reads configuration parameter value from the database or form POST data if required.
-     * 
+     *
      * @param string $key name of the parameter without the prefix
      * @param bool $post whether to read the value from form POST data (true) or database (false)
-     * 
+     *
      * @return config parameter value
      */
     public function getConfigValue($key, $post = false)
     {
         $name = 'CONFIRMO_' . $key;
-        $value = trim($post && isset($_POST[$name]) ? $_POST[$name] : Configuration::get($name));
+        $value = trim($post && Tools::getIsset($name) ? Tools::getValue($name) : Configuration::get($name));
 
         // use default value if empty
-        if (!strlen($value)) {
+        if (!Tools::strlen($value)) {
             $defaultValues = $this->getDefaultValues();
 
             if (isset($defaultValues[$name])) {
@@ -578,10 +575,10 @@ class Confirmo extends PaymentModule
                 'name' => $this->cryptoCurrencies[$currencyCode],
                 'code' => $currencyCode,
                 'payment_url' => $this->context->link->getModuleLink($this->name, 'payment', array('currency' => $currencyCode), Configuration::get('PS_SSL_ENABLED')),
-                'button_image_url' => $this->_path . 'views/img/ccy_' . strtolower($currencyCode) . '.png'
+                'button_image_url' => $this->_path . 'views/img/ccy_' . Tools::strtolower($currencyCode) . '.png'
             );
         }
-        
+
         $this->smarty->assign(array(
             'prestashop_15' => version_compare(_PS_VERSION_, '1.5', '>=') && version_compare(_PS_VERSION_, '1.6', '<'),
             'payment_buttons' => $paymentButtons
@@ -589,7 +586,7 @@ class Confirmo extends PaymentModule
 
         return $this->display(__FILE__, 'payment.tpl');
     }
-    
+
     /**
      * Handles hook for payment options for PS >= 1.7.
      */
@@ -607,10 +604,10 @@ class Confirmo extends PaymentModule
                 ->setCallToActionText($this->l('Pay with') . ' ' . $this->cryptoCurrencies[$currencyCode])
                 ->setAction($this->context->link->getModuleLink($this->name, 'payment', array('currency' => $currencyCode), Configuration::get('PS_SSL_ENABLED')))
                 ->setAdditionalInformation($this->context->smarty->fetch('module:confirmo/views/templates/front/payment_infos.tpl'));
-                //->setLogo($this->_path . 'views/img/ccy_' . strtolower($currencyCode) . '.png');
+                //->setLogo($this->_path . 'views/img/ccy_' . Tools::strtolower($currencyCode) . '.png');
             $paymentButtons[] = $newOption;
         }
-        
+
         return $paymentButtons;
     }
 
@@ -622,11 +619,11 @@ class Confirmo extends PaymentModule
         if (!$this->active) {
             return;
         }
-        
+
         if (version_compare(_PS_VERSION_, '1.7', '>=') === true) {
-            $order     = $params['order'];
+            $order = $params['order'];
         } else {
-            $order     = $params['objOrder'];
+            $order = $params['objOrder'];
         }
 
         $id_order_states = Db::getInstance()->ExecuteS('
@@ -708,7 +705,7 @@ class Confirmo extends PaymentModule
      * @param array $requestData optional array of request data to override values retrieved from the order object
      *
      * @return array response data with new invoice
-     * 
+     *
      * @throws UnexpectedValueException if no API key has been set
      * @throws Exception if an unexpected API response was returned
      */
@@ -759,7 +756,7 @@ class Confirmo extends PaymentModule
      * @param bool $returnRaw return the raw response string
      *
      * @return stdClass response data after json_decode
-     * 
+     *
      * @throws Exception
      */
     public function apiRequest($endpoint, $request = array(), $returnRaw = false)
@@ -822,7 +819,7 @@ class Confirmo extends PaymentModule
 
     /**
      * Creates a custom order status for this module.
-     * 
+     *
      * @param string $name new status name
      * @param string $label new status lables
      * @param array $options optional additional options
@@ -833,7 +830,7 @@ class Confirmo extends PaymentModule
      */
     public function createOrderStatus($name, $label, $options = array(), $template = null, $icon = 'status.gif')
     {
-        $osName = 'CONFIRMO_OS_' . strtoupper($name);
+        $osName = 'CONFIRMO_OS_' . Tools::strtoupper($name);
 
         if (!Configuration::get($osName)) {
             $os = new OrderState();
@@ -861,7 +858,7 @@ class Confirmo extends PaymentModule
 
                 // copy icon image to os folder
                 if ($icon) {
-                    @copy(__DIR__ . '/views/img/' . $icon, _PS_ROOT_DIR_ . '/img/os/' . $os->id . '.gif');
+                    copy(__DIR__ . '/views/img/' . $icon, _PS_ROOT_DIR_ . '/img/os/' . $os->id . '.gif');
                 }
 
                 return (int)$os->id;
@@ -873,12 +870,12 @@ class Confirmo extends PaymentModule
 
     /**
      * Deletes custom order status for this module by name.
-     * 
+     *
      * @param string $name status name
      */
     public function deleteOrderStatus($name)
     {
-        $osName = 'CONFIRMO_OS_' . strtoupper($name);
+        $osName = 'CONFIRMO_OS_' . Tools::strtoupper($name);
 
         if ($osId = Configuration::get($osName)) {
             $os = new OrderState($osId);
@@ -892,14 +889,14 @@ class Confirmo extends PaymentModule
 
     /**
      * Gets the custom order status ID by name.
-     * 
+     *
      * @param string $name status name
      *
      * @return int|bool false on failure to retrieve, status ID if successful
      */
     public function getOrderStatus($name)
     {
-        return (int)ConfigurationCore::get('CONFIRMO_OS_' . strtoupper($name));
+        return (int)ConfigurationCore::get('CONFIRMO_OS_' . Tools::strtoupper($name));
     }
 
 
@@ -943,19 +940,19 @@ class Confirmo extends PaymentModule
         }
         return false;
     }
-    
+
     /**
      * Translates currency code to currency name.
-     * 
+     *
      * @param string $currencyCode currency code
-     * 
+     *
      * @return string currency name
      */
     public function currencyCodeToName($currencyCode)
     {
         return $this->cryptoCurrencies[$currencyCode];
     }
-    
+
     /**
      * Extracts enabled settlement currencies from the API response object.
      *
@@ -973,5 +970,5 @@ class Confirmo extends PaymentModule
         }
         return $currencies;
     }
-    
+
 }

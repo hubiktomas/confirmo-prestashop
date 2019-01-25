@@ -5,7 +5,7 @@
  * NOTICE OF LICENSE
  *
  * This file is part of Confirmo PrestaShop module.
- * 
+ *
  * Confirmo PrestaShop module is free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the License,
@@ -36,8 +36,8 @@
 class ConfirmoReturnModuleFrontController extends ModuleFrontController
 {
     /**
-	 * @see FrontController::initContent()
-	 */
+     * @see FrontController::initContent()
+     */
     public function initContent()
     {
         parent::initContent();

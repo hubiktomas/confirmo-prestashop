@@ -5,7 +5,7 @@
  * NOTICE OF LICENSE
  *
  * This file is part of Confirmo PrestaShop module.
- * 
+ *
  * Confirmo PrestaShop module is free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the License,
@@ -39,8 +39,8 @@ class ConfirmoPaymentModuleFrontController extends ModuleFrontController
     public $display_column_left = false;
 
     /**
-	 * @see FrontController::initContent()
-	 */
+     * @see FrontController::initContent()
+     */
     public function initContent()
     {
         parent::initContent();
@@ -56,7 +56,7 @@ class ConfirmoPaymentModuleFrontController extends ModuleFrontController
         if (!$this->module->checkCurrency($cart)) {
             $this->displayError("Current currency not enabled for this payment method.");
         }
-        
+
         $cryptoCurrency = Tools::getValue('currency');
         // if crypto currency isn't set, then display error
         if (!$cryptoCurrency) {
@@ -81,7 +81,7 @@ class ConfirmoPaymentModuleFrontController extends ModuleFrontController
 
     /**
      * Redirects to the error page and displays message to the customer.
-     * 
+     *
      * @param string $errorMessage error message to display to the customer
      */
     public function displayError($errorMessage)
