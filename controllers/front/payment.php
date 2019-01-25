@@ -73,8 +73,7 @@ class ConfirmoPaymentModuleFrontController extends ModuleFrontController
             } else {
                 $this->displayError("Failed to retrieve BitcoinPay Beta payment URL.");
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->displayError($e->getMessage());
         }
     }
