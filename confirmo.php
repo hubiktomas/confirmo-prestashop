@@ -84,7 +84,8 @@ class Confirmo extends PaymentModule
             $this->warning = $this->l("No currencies have been enabled for this module.");
         }
 
-        if ($apiKey = $this->getConfigValue('API_KEY')) {
+        $apiKey = $this->getConfigValue('API_KEY');
+        if ($apiKey) {
             $this->apiKey = $apiKey;
         }
     }
@@ -876,8 +877,9 @@ class Confirmo extends PaymentModule
     public function deleteOrderStatus($name)
     {
         $osName = 'CONFIRMO_OS_' . Tools::strtoupper($name);
+        $osId = Configuration::get($osName);
 
-        if ($osId = Configuration::get($osName)) {
+        if ($osId) {
             $os = new OrderState($osId);
             $os->delete();
 
@@ -910,7 +912,8 @@ class Confirmo extends PaymentModule
     public function checkCallbackPassword($callback)
     {
         // check callback passwork if it has been set
-        if ($callbackPassword = $this->getConfigValue('CALLBACK_PASSWORD')) {
+        $callbackPassword = $this->getConfigValue('CALLBACK_PASSWORD');
+        if ($callbackPassword) {
             if (!isset($_SERVER['HTTP_CALLBACKSIGNATURE']) || $_SERVER['HTTP_CALLBACKSIGNATURE'] != hash('sha256', $callback . $callbackPassword)) {
                 return false;
             }
