@@ -415,7 +415,7 @@ class Confirmo extends PaymentModule
         );
 
         // config fields for each supported cryptocurrency
-        foreach($this->cryptoCurrencies as $currencyCode => $currencyName) {
+        foreach ($this->cryptoCurrencies as $currencyCode => $currencyName) {
             $formFields[0]['form']['input'][] = array(
                 'tab' => 'cryptocurrencies',
                 'name' => 'CONFIRMO_ACCEPTED_CRYPTOCURRENCIES_' . $currencyCode,
@@ -498,12 +498,12 @@ class Confirmo extends PaymentModule
         if ($initial) {
             $configFieldValues['CONFIRMO_ACCEPTED_CRYPTOCURRENCIES'] = $this->getConfigValue('ACCEPTED_CRYPTOCURRENCIES');
             $acceptedCurrencies = unserialize($configFieldValues['CONFIRMO_ACCEPTED_CRYPTOCURRENCIES']);
-            foreach($this->cryptoCurrencies as $currencyCode => $currencyName) {
+            foreach ($this->cryptoCurrencies as $currencyCode => $currencyName) {
                 $configFieldValues['CONFIRMO_ACCEPTED_CRYPTOCURRENCIES_' . $currencyCode] = in_array($currencyCode, $acceptedCurrencies) ? 1 : 0;
             }
         } else {
             $acceptedCurrencies = array();
-            foreach($this->cryptoCurrencies as $currencyCode => $currencyName) {
+            foreach ($this->cryptoCurrencies as $currencyCode => $currencyName) {
                 $configFieldValues['CONFIRMO_ACCEPTED_CRYPTOCURRENCIES_' . $currencyCode] = $this->getConfigValue('ACCEPTED_CRYPTOCURRENCIES_' . $currencyCode, true);
                 if ($configFieldValues['CONFIRMO_ACCEPTED_CRYPTOCURRENCIES_' . $currencyCode]) {
                     $acceptedCurrencies[] = $currencyCode;
@@ -639,7 +639,7 @@ class Confirmo extends PaymentModule
         $received = false;
         $refunded = false;
         $error = false;
-        foreach($id_order_states as $state) {
+        foreach ($id_order_states as $state) {
             if ($state['id_order_state'] == (int)Configuration::get('PS_OS_OUTOFSTOCK')) {
                 $outofstock = true;
             }
@@ -973,5 +973,4 @@ class Confirmo extends PaymentModule
         }
         return $currencies;
     }
-
 }
