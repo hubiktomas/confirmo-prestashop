@@ -60,7 +60,7 @@ class Confirmo extends PaymentModule
     {
         $this->name = 'confirmo';
         $this->tab = 'payments_gateways';
-        $this->version = '2.1.0';
+        $this->version = '2.1.1';
         $this->author = 'Tomas Hubik';
         $this->author_uri = 'https://github.com/hubiktomas';
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.7');
