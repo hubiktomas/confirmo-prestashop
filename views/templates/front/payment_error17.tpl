@@ -32,16 +32,16 @@
 {extends file='page.tpl'}
 
 {block name="page_content"}
-  <h1 class="page-heading">{$heading}</h1>
+  <h1 class="page-heading">{$heading|escape:'html':'UTF-8'}</h1>
 
   <div class="alert alert-danger">
     {l s='An error occurred while attempting to create a new BitcoinPay Beta payment.' mod='confirmo'}
   </div>
 
   <p>
-    {{l s='The raw response data is displayed below. Please %sforward this%s to the site administrator so that they may rectify the issue.' mod='confirmo'}|sprintf:"<a href=\"{$link->getPageLink('contact')}\" target=\"_blank\">":'</a>' nofilter}
+    {l s='The raw response data is displayed below. Please' mod='confirmo'} <a href="{$link->getPageLink('contact')|escape:'html':'UTF-8'}" target="_blank">{l s='forward this' mod='confirmo'}</a> {l s='to the site administrators so that they can rectify the issue.' mod='confirmo'}
   </p>
-  <pre>{$error}</pre>
+  <pre>{$error|escape:'html':'UTF-8'}</pre>
 
   <p class="cart_navigation clearfix" id="cart_navigation">
     <a href="{$link->getPageLink('order', true, NULL, 'step=3')|escape:'html':'UTF-8'}" class="button-exclusive btn btn-default">

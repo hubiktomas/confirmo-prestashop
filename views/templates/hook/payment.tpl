@@ -32,9 +32,9 @@
 {if $prestashop_15}
   {foreach from=$payment_buttons item=item}
     <p class="payment_module">
-      <a href="{$item.payment_url|escape:'html'}" title="{l s='Pay with' mod='confirmo'} {$item.name}">
-        <img src="{$item.button_image_url}" height="50" />
-        {l s='Pay with' mod='confirmo'} {$item.name}
+      <a href="{$item.payment_url|escape:'html':'UTF-8'}" title="{l s='Pay with' mod='confirmo'} {$item.name|escape:'html':'UTF-8'}">
+        <img src="{$item.button_image_url|escape:'html':'UTF-8'}" height="50" />
+        {l s='Pay with' mod='confirmo'} {$item.name|escape:'html':'UTF-8'}
       </a>
     </p>
   {/foreach}
@@ -43,8 +43,8 @@
     <div class="row">
       <div class="col-xs-12">
         <p class="payment_module">
-          <a class="confirmo bankwire" href="{$item.payment_url|escape:'html'}" title="{l s='Pay with' mod='confirmo'} {$item.name}" style="background-image: url('{$item.button_image_url}'); background-position: 15px 50%;">
-            {l s='Pay with' mod='confirmo'} {$item.name}
+          <a class="confirmo bankwire" href="{$item.payment_url|escape:'html':'UTF-8'}" title="{l s='Pay with' mod='confirmo'} {$item.name|escape:'html':'UTF-8'}" style="background-image: url('{$item.button_image_url|escape:'html':'UTF-8'}'); background-position: 15px 50%;">
+            {l s='Pay with' mod='confirmo'} {$item.name|escape:'html':'UTF-8'}
           </a>
         </p>
       </div>

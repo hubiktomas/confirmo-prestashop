@@ -32,10 +32,10 @@
 {assign var='back_link' value={$link->getPageLink('order', true, NULL, 'step=3')|escape:'html':'UTF-8'}}
 
 {capture name=path}
-  {$heading}
+  {$heading|escape:'html':'UTF-8'}
 {/capture}
 
-<h1 class="page-heading">{$heading}</h1>
+<h1 class="page-heading">{$heading|escape:'html':'UTF-8'}</h1>
 
 {assign var='current_step' value='payment'}
 {include file="$tpl_dir./order-steps.tpl"}
@@ -45,7 +45,7 @@
 </div>
 
 <p>
-  {{l s='Please wait a short while then click on "Check again" below. If there is no change please %scontact us%s before placing another order so we can try to manually verify your payment.' mod='confirmo'}|sprintf:"<a href=\"{$link->getPageLink('contact')}\">":'</a>'}
+  {l s='Please wait a short while then click the "Check again" below. If there is no change, please' mod='confirmo'} <a href="{$link->getPageLink('contact')|escape:'html':'UTF-8'}">{l s='contact us' mod='confirmo'}</a> {l s='before placing another order so we can try to manually verify your payment.' mod='confirmo'}
 </p>
 
 <p class="cart_navigation clearfix" id="cart_navigation">

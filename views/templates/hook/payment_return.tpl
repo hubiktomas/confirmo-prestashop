@@ -31,7 +31,7 @@
 
 {if $refunded}
   <div class="alert alert-info">
-    {{l s='Your payment has been refunded. Please make sure, you send the payment on time in full amount including network fee. Please %scontact us%s if you need further assistance.' mod='confirmo'}|sprintf:"<a href=\"{$link->getPageLink('contact')}\">":'</a>' nofilter}
+    {l s='Your payment has been refunded. Please make sure, you send the payment on time in full amount including network fee. Please' mod='confirmo'} <a href="{$link->getPageLink('contact')|escape:'html':'UTF-8'}">{l s='contact us' mod='confirmo'}</a> {l s='if you need further assistance.' mod='confirmo'}
   </div>
 {elseif $confirmed}
   {if $outofstock }
@@ -53,6 +53,6 @@
   </div>
 {else}
   <div class="alert alert-danger">
-    {l s='Unexpected error, please contact us.' mod='confirmo'}
+    {l s='Unexpected error, please' mod='confirmo'} <a href="{$link->getPageLink('contact')|escape:'html':'UTF-8'}">{l s='contact us' mod='confirmo'}</a>.
   </div>
 {/if}

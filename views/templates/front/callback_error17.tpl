@@ -32,13 +32,15 @@
 {extends file='page.tpl'}
 
 {block name="page_content"}
-  <h1 class="page-heading">{$heading}</h1>
+  <h1 class="page-heading">{$heading|escape:'html':'UTF-8'}</h1>
 
   <div class="alert alert-warning">
     {l s='Oh snap! Something went wrong and we were unable to verify your payment to BitcoinPay Beta.' mod='confirmo'}
   </div>
 
-  <p>{{l s='Please wait a short while then click on "Check again" below. If there is no change please %scontact us%s before placing another order so we can try to manually verify your payment.' mod='confirmo'}|sprintf:"<a href=\"{$link->getPageLink('contact')}\">":'</a>' nofilter}</p>
+<p>
+  {l s='Please wait a short while then click the "Check again" below. If there is no change, please' mod='confirmo'} <a href="{$link->getPageLink('contact')|escape:'html':'UTF-8'}">{l s='contact us' mod='confirmo'}</a> {l s='before placing another order so we can try to manually verify your payment.' mod='confirmo'}
+</p>
 
   <p class="cart_navigation clearfix" id="cart_navigation">
     <a href="" class="button-exclusive btn btn-default">
