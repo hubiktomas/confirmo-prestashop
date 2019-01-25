@@ -629,8 +629,8 @@ class Confirmo extends PaymentModule
 
         $id_order_states = Db::getInstance()->ExecuteS('
             SELECT `id_order_state`
-            FROM `'._DB_PREFIX_.'order_history`
-            WHERE `id_order` = '.$order->id.'
+            FROM `' . _DB_PREFIX_ . 'order_history`
+            WHERE `id_order` = ' . $order->id . '
             ORDER BY `date_add` DESC, `id_order_history` DESC
         ');
 
