@@ -84,6 +84,10 @@ class ConfirmoNotificationModuleFrontController extends ModuleFrontController
             $this->error("Secure key is invalid.", $callback);
         }
 
+        // set context variables
+        $this->context->cart = $cart;
+        $this->context->customer = $customer;
+
         // set order status according to payment status
         switch ($callbackData->status) {
             case 'paid':
