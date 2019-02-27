@@ -2,7 +2,7 @@
 <module>
 	<name>confirmo</name>
 	<displayName><![CDATA[BitcoinPay Beta]]></displayName>
-	<version><![CDATA[2.2.1]]></version>
+	<version><![CDATA[2.2.2]]></version>
 	<description><![CDATA[Accept payments in cryptocurrencies and receive payouts in multiple currencies.]]></description>
 	<author><![CDATA[Tomas Hubik]]></author>
 	<tab><![CDATA[payments_gateways]]></tab>
