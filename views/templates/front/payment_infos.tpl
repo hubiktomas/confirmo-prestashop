@@ -30,5 +30,5 @@
  *}
 
 <section>
-  <p>{l s='You will be redirected to the BitcoinPay Beta payment gateway to send the transaction.' mod='confirmo'}</p>
+  <p>{l s='You will be redirected to the Confirmo payment gateway to send the transaction.' mod='confirmo'}</p>
 </section>

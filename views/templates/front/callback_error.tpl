@@ -41,7 +41,7 @@
 {include file="$tpl_dir./order-steps.tpl"}
 
 <div class="alert alert-warning">
-  {l s='Oh snap! Something went wrong and we were unable to verify your payment to BitcoinPay Beta.' mod='confirmo'}
+  {l s='Oh snap! Something went wrong and we were unable to verify your payment to Confirmo.' mod='confirmo'}
 </div>
 
 <p>

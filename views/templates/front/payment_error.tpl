@@ -41,7 +41,7 @@
 {include file="$tpl_dir./order-steps.tpl"}
 
 <div class="alert alert-danger">
-  {l s='An error occurred while attempting to create a new BitcoinPay Beta payment.' mod='confirmo'}
+  {l s='An error occurred while attempting to create a new Confirmo payment.' mod='confirmo'}
 </div>
 
 <p>

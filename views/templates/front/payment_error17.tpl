@@ -35,7 +35,7 @@
   <h1 class="page-heading">{$heading|escape:'html':'UTF-8'}</h1>
 
   <div class="alert alert-danger">
-    {l s='An error occurred while attempting to create a new BitcoinPay Beta payment.' mod='confirmo'}
+    {l s='An error occurred while attempting to create a new Confirmo payment.' mod='confirmo'}
   </div>
 
   <p>

@@ -35,7 +35,7 @@
   <h1 class="page-heading">{$heading|escape:'html':'UTF-8'}</h1>
 
   <div class="alert alert-warning">
-    {l s='Oh snap! Something went wrong and we were unable to verify your payment to BitcoinPay Beta.' mod='confirmo'}
+    {l s='Oh snap! Something went wrong and we were unable to verify your payment to Confirmo.' mod='confirmo'}
   </div>
 
 <p>

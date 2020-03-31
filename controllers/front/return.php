@@ -72,7 +72,7 @@ class ConfirmoReturnModuleFrontController extends ModuleFrontController
                     } else {
                         // oh snap! the order hasn't been created yet which means the callback is not being sent/received or there is another problem
                         // let's show an appropriate error page to the customer and hope for the best
-                        $heading = $this->module->l("BitcoinPay Beta Error");
+                        $heading = $this->module->l("Confirmo Error");
 
                         if (isset($this->context->smarty->tpl_vars['meta_title'])) {
                             $meta_title = $heading . ' - ' . $this->context->smarty->tpl_vars['meta_title']->value;

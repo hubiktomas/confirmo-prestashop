@@ -49,7 +49,7 @@
   </div>
 {elseif $error}
   <div class="alert alert-danger">
-    {l s='There was a problem processing your order. We recommend to press back button in your web browser and request the refund via BitcoinPay Beta.' mod='confirmo'}
+    {l s='There was a problem processing your order. We recommend to press back button in your web browser and request the refund via Confirmo.' mod='confirmo'}
   </div>
 {else}
   <div class="alert alert-danger">

@@ -68,10 +68,10 @@ class ConfirmoNotificationModuleFrontController extends ModuleFrontController
 
         // check that the cart and currency are both valid
         $cart = new Cart((int)$reference->cart_id);
-        if (!$callbackData->invoice || !$callbackData->invoice->currency || !$callbackData->invoice->amount) {
+        if (!$callbackData->merchantAmount || !$callbackData->merchantAmount->currency || !$callbackData->merchantAmount->amount) {
             $this->error("Invoice, invoice amount or invoice currency not set.", $callback);
         }
-        $currency = Currency::getCurrencyInstance((int)Currency::getIdByIsoCode($callbackData->invoice->currency));
+        $currency = Currency::getCurrencyInstance((int)Currency::getIdByIsoCode($callbackData->merchantAmount->currency));
         if (!Validate::isLoadedObject($cart) || (!Validate::isLoadedObject($currency) || $currency->id != $cart->id_currency)) {
             $this->error("Cart or currency in callback is invalid.", $callback);
         }
@@ -131,22 +131,27 @@ class ConfirmoNotificationModuleFrontController extends ModuleFrontController
             $message->id_order = $order->id;
             $message->private = true;
             $message->add();
+
         } else {
             // create order
             $extra = array('transaction_id' => $callbackData->id);
             $shop = !empty($reference->shop_id) ? new Shop((int)$reference->shop_id) : null;
-            $payment_method = $this->module->l("BitcoinPay Beta");
+
+            $payment_method = $this->module->l("Confirmo");
             // set payment method name to currency name if enabled
             if ($this->module->getConfigValue('CURRENCY_IN_PAYMENT_METHOD')) {
-                if ($callbackData->crypto && $callbackData->crypto->currency) {
-                    $currencyName = $this->module->currencyCodeToName($callbackData->crypto->currency);
+                if ($callbackData->customerAmount && $callbackData->customerAmount->currency) {
+                    $currencyName = $this->module->currencyCodeToName($callbackData->customerAmount->currency);
                     if ($currencyName) {
                         $payment_method = $currencyName;
                     }
                 }
             }
-            $this->module->validateOrder($cart->id, $orderStatus, $callbackData->invoice->amount, $payment_method, null, $extra, null, false, $customer->secure_key, $shop);
+            $this->module->validateOrder($cart->id, $orderStatus, $callbackData->merchantAmount->amount, $payment_method, null, $extra, null, false, $customer->secure_key, $shop);
             $order = new Order($this->module->currentOrder);
+
+            // just showing invoice Id in order's payment.
+            $order->addOrderPayment(0, $payment_method, $callbackData->id);
 
             // add Confirmo payment info to private order note for admin reference
             $messageLines = array(
@@ -154,24 +159,24 @@ class ConfirmoNotificationModuleFrontController extends ModuleFrontController
                 $this->module->l('Payment ID') . ': ' . $callbackData->id,
                 $this->module->l('Payment Address') . ': ' . $callbackData->address,
             );
-            if ($callbackData->crypto) {
-                $messageLines[] = $this->module->l('Requested Amount') . ': ' . sprintf('%f', $callbackData->crypto->amount) . ' ' . $callbackData->crypto->currency;
+            if ($callbackData->customerAmount) {
+                $messageLines[] = $this->module->l('Requested Amount') . ': ' . sprintf('%f', $callbackData->customerAmount->amount) . ' ' . $callbackData->customerAmount->currency;
             }
             if ($callbackData->paid) {
                 $messageLines[] = $this->module->l('Paid Amount') . ': ' . sprintf('%f', $callbackData->paid->amount) . ' ' . $callbackData->paid->currency;
                 $messageLines[] = $this->module->l('Difference') . ': ' . sprintf('%f', $callbackData->paid->diff) . ' ' . $callbackData->paid->currency;
             }
             if ($callbackData->rate) {
-                $messageLines[] = $this->module->l('Exchange rate') . ': ' . sprintf('%f', $callbackData->rate->rate) . ' ' . $callbackData->rate->currency . '/' . $callbackData->rate->currencyX;
+                $messageLines[] = $this->module->l('Exchange rate') . ': ' . sprintf('%f', $callbackData->rate->value) . ' ' . $callbackData->rate->currencyFrom . '/' . $callbackData->rate->currencyTo;
             }
             if (!empty($callbackData->url)) {
                 $messageLines[] = $this->module->l('Invoice URL') . ': ' . $callbackData->url;
             }
             $message = new Message();
             $message->message = implode(PHP_EOL . ' ', $messageLines);
-            $message->id_order = $order->id;
             $message->id_cart = $order->id_cart;
             $message->id_customer = $order->id_customer;
+            $message->id_order = $order->id;
             $message->private = true;
             $message->add();
 
@@ -190,7 +195,7 @@ class ConfirmoNotificationModuleFrontController extends ModuleFrontController
                 $customer_message = new CustomerMessage();
                 $customer_message->id_customer_thread = $customer_thread->id;
                 $customer_message->id_employee = 0;
-                $customer_message->message = $this->module->l('BitcoinPay Beta Invoice URL') . ': ' . $callbackData->url;
+                $customer_message->message = $this->module->l('Confirmo Invoice URL') . ': ' . $callbackData->url;
                 $customer_message->private = 0;
                 $customer_message->add();
             }

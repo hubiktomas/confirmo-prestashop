@@ -37,7 +37,7 @@ defined('_PS_VERSION_') or die;
  */
 class Confirmo extends PaymentModule
 {
-    protected $apiUrl = 'https://beta.bitcoinpay.com/api/';
+    protected $apiUrl = 'https://confirmo.net/api/v3/';
     protected $apiKey;
     protected $defaultValues = array();
     protected $cryptoCurrencies = array(
@@ -60,7 +60,7 @@ class Confirmo extends PaymentModule
     {
         $this->name = 'confirmo';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.2';
+        $this->version = '3.0.2';
         $this->author = 'Tomas Hubik';
         $this->author_uri = 'https://github.com/hubiktomas';
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.7');
@@ -73,7 +73,7 @@ class Confirmo extends PaymentModule
 
         parent::__construct();
 
-        $this->displayName = $this->l("BitcoinPay Beta");
+        $this->displayName = $this->l("Confirmo");
         $this->description = $this->l("Accept payments in cryptocurrencies and receive payouts in multiple currencies.");
 
         if (!$this->getConfigValue('API_KEY')) {
@@ -185,28 +185,31 @@ class Confirmo extends PaymentModule
                 try {
                     // get list of settlement currencies from the account
                     $this->apiKey = $fieldValues['CONFIRMO_API_KEY'];
-                    $response = $this->apiRequest('currencies');
+                    $response = $this->apiRequest('settlement-methods');
 
-                    if (!$response->currencies || !is_array($response->currencies)) {
+                    if (!$response->data || !is_array($response->data)) {
                         $errorMsg = $this->l("Error while retrieving settlement methods from you account.");
                         $output .= $this->displayError($errorMsg);
                     } else {
                         // Extract only enabled currencies (settlement set in the account)
-                        $enabledCurrenciesArray = $this->extractEnabledSettlementCurrencies($response->currencies);
+                        $enabledCurrenciesArray = $this->extractEnabledSettlementCurrencies($response->data);
                         $acceptedCurrenciesArray = unserialize($fieldValues['CONFIRMO_ACCEPTED_CRYPTOCURRENCIES']);
+                        $nonAcceptedCurrencies = array_diff($acceptedCurrenciesArray, array_intersect($acceptedCurrenciesArray, $enabledCurrenciesArray));
                         if (empty($enabledCurrenciesArray)) {
-                            $errorMsg = $this->l("Settlement methods not set in your BitcoinPay Beta account. Go to Settings > Settlement Methods and add settlement methods first.");
+                            $errorMsg = $this->l("Settlement methods not set in your Confirmo account. Go to Settings > Settlement methods > Add settlement method and add settlement methods first.");
                             $output .= $this->displayError($errorMsg);
                         } else {
                             // For payout in crypto, there has to be a settlement currency for each accepted cryptocurrency
                             if ($fieldValues['CONFIRMO_PAYOUT_CURRENCY'] == 'CRYPTO' && array_intersect($acceptedCurrenciesArray, $enabledCurrenciesArray) != $acceptedCurrenciesArray) {
                                 $errorMsg = $this->l("For payout in cryptocurrencies, there has to be a settlement method for each accepted cryptocurrency. There is a missing settlement method for the following cryptourrencies:");
-                                $errorMsg .= '<br> <ul><li>' . implode('</li><li>', array_diff($acceptedCurrenciesArray, array_intersect($acceptedCurrenciesArray, $enabledCurrenciesArray))) . '</li></ul>';
+                                $errorMsg .= '<br> <ul><li>' . implode('</li><li>', $nonAcceptedCurrencies) . '</li></ul>';
+                                $errorMsg .= sprintf($this->l("Please add %s settlement method(s) in your Confirmo account first: Settings > Settlement methods > Add settlement method"), implode(', ', $nonAcceptedCurrencies));
                                 $output .= $this->displayError($errorMsg);
                             // Check if there is a settlement currency for payout currency in fiat
                             } elseif ($fieldValues['CONFIRMO_PAYOUT_CURRENCY'] != 'CRYPTO' && !in_array($fieldValues['CONFIRMO_PAYOUT_CURRENCY'], $enabledCurrenciesArray)) {
-                                $errorMsg = $this->l("Settlement method for selected payout currency not set in your BitcoinPay Beta account. You currently have the following settlement currencies set:");
+                                $errorMsg = $this->l("Settlement method for the selected payout currency not set in your Confirmo account. You currently have the following settlement methods set:");
                                 $errorMsg .= '<br> <ul><li>' . implode('</li><li>', $enabledCurrenciesArray) . '</li></ul>';
+                                $errorMsg .= sprintf($this->l("Please add %s settlement method in your Confirmo account first: Settings > Settlement methods > Add settlement method"), $fieldValues['CONFIRMO_PAYOUT_CURRENCY']);
                                 $output .= $this->displayError($errorMsg);
                             }
                         }
@@ -227,7 +230,7 @@ class Confirmo extends PaymentModule
                     Configuration::updateValue($fieldName, $fieldValue);
                 }
 
-                $output .= $this->displayConfirmation($this->l("BitcoinPay Beta settings saved."));
+                $output .= $this->displayConfirmation($this->l("Confirmo settings saved."));
             } else {
                 $loadInitial = false;
             }
@@ -256,7 +259,7 @@ class Confirmo extends PaymentModule
             array(
                 'form' => array(
                     'legend' => array(
-                        'title' => $this->l("BitcoinPay Beta Settings"),
+                        'title' => $this->l("Confirmo Settings"),
                         'icon' => 'icon-cog'
                     ),
                     'tabs' => array(
@@ -278,7 +281,7 @@ class Confirmo extends PaymentModule
                             'name' => 'CONFIRMO_CALLBACK_PASSWORD',
                             'type' => 'text',
                             'label' => $this->l("Callback Password"),
-                            'desc' => $this->l("Used as a data validation for stronger security. Callback password must be set under Settings > Security in your BitcoinPay Beta account."),
+                            'desc' => $this->l("Used as a data validation for stronger security. Callback password must be set under Settings > Security in your Confirmo account."),
                             'required' => true
                         ),
                         array(
@@ -286,7 +289,7 @@ class Confirmo extends PaymentModule
                             'name' => 'CONFIRMO_PAYOUT_CURRENCY',
                             'label' => $this->l("Payout Currency"),
                             'type' => 'select',
-                            'desc' => $this->l("Currency of settlement. You must first set a settlement method for the currency in your BitcoinPay Beta account in Settings > Settlement Methods."),
+                            'desc' => $this->l("Currency of settlement. You must first set a settlement method for the currency in your Confirmo account in Settings > Settlement Methods."),
                             'options' => array(
                                 'query' => $this->payoutCurrencies,
                                 'id' => 'code',
@@ -318,7 +321,7 @@ class Confirmo extends PaymentModule
                             'name' => 'CONFIRMO_INVOICE_URL_MESSAGE',
                             'type' => 'switch',
                             'label' => $this->l("Customer Message with Invoice URL"),
-                            'desc' => $this->l("Creates new message with BitcoinPay Beta invoice URL for every order so that customer can access it from order detail page. This setting will create new customer thread for every order."),
+                            'desc' => $this->l("Creates new message with Confirmo invoice URL for every order so that customer can access it from order detail page. This setting will create new customer thread for every order."),
                             'values' => array(
                                 array(
                                     'id' => 'active_on',
@@ -337,7 +340,7 @@ class Confirmo extends PaymentModule
                             'name' => 'CONFIRMO_CURRENCY_IN_PAYMENT_METHOD',
                             'type' => 'switch',
                             'label' => $this->l("Currency Name in Payment Method"),
-                            'desc' => $this->l("Use currency name as the order payment method. Payment method will be BitcoinPay Beta for any currency if disabled."),
+                            'desc' => $this->l("Use currency name as the order payment method. Payment method will be Confirmo for any currency if disabled."),
                             'values' => array(
                                 array(
                                     'id' => 'active_on',
@@ -362,7 +365,7 @@ class Confirmo extends PaymentModule
                             'tab' => 'order_statuses',
                             'name' => 'CONFIRMO_STATUS_CONFIRMED',
                             'type' => 'select',
-                            'label' => $this->l("Payment Confirmed"),
+                            'label' => $this->l("Paid"),
                             'desc' => $this->l("The invoice is paid and has enough confirmations."),
                             'options' => array(
                                 'query' => $orderStatuses,
@@ -374,7 +377,7 @@ class Confirmo extends PaymentModule
                             'tab' => 'order_statuses',
                             'name' => 'CONFIRMO_STATUS_RECEIVED',
                             'type' => 'select',
-                            'label' => $this->l("Payment Received"),
+                            'label' => $this->l("Confirming"),
                             'desc' => $this->l("At least the required amount has been paid but a sufficient number of confirmations has not been received yet."),
                             'options' => array(
                                 'query' => $orderStatuses,
@@ -713,7 +716,7 @@ class Confirmo extends PaymentModule
     public function createPayment($cart, $cryptoCurrency, $requestData = array())
     {
         if (!$this->apiKey) {
-            throw new UnexpectedValueException("BitcoinPay Beta API Key has not been set.");
+            throw new UnexpectedValueException("Confirmo API Key has not been set.");
         }
 
         $customer = new Customer($cart->id_customer);
@@ -722,11 +725,13 @@ class Confirmo extends PaymentModule
         $request = array(
             'invoice' => array(
                 'amount' => (string)$cart->getOrderTotal(),
-                'currency' => Currency::getCurrencyInstance($cart->id_currency)->iso_code,
-                'currencyX' => $cryptoCurrency
+                'currencyFrom' => Currency::getCurrencyInstance($cart->id_currency)->iso_code,
+                'currencyTo' => $cryptoCurrency
             ),
-            // for cryptocurrencies, settlement currency must match the invoice currency - custom settlement currency is possible only for fiat currencies
-            'settlementMethodCurrency' => $this->getConfigValue('PAYOUT_CURRENCY') == 'CRYPTO' ? $cryptoCurrency : $this->getConfigValue('PAYOUT_CURRENCY'),
+            'settlement' => array(
+                // for cryptocurrencies, settlement currency must match the invoice currency - custom settlement currency is possible only for fiat currencies
+                'currency' => $this->getConfigValue('PAYOUT_CURRENCY') == 'CRYPTO' ? $cryptoCurrency : $this->getConfigValue('PAYOUT_CURRENCY')
+            ),
             'reference' => json_encode(array(
                 'cart_id' => (string)$cart->id,
                 'shop_id' => (string)$cart->id_shop,
@@ -739,7 +744,6 @@ class Confirmo extends PaymentModule
         if ($notifyEmail = $this->getConfigValue('NOTIFY_EMAIL')) {
             $request['notifyEmail'] = $notifyEmail;
         }
-
         // override default request data if set
         if ($requestData) {
             $request = array_merge_recursive($request, $requestData);
@@ -768,7 +772,7 @@ class Confirmo extends PaymentModule
             CURLOPT_URL => $this->apiUrl . ltrim($endpoint, '/'),
             CURLOPT_HTTPHEADER => array(
                 "Content-Type: application/json",
-                "Authorization: " . $this->apiKey,
+                "Authorization: Bearer " . $this->apiKey,
             ),
             CURLOPT_HEADER => false,
             CURLOPT_RETURNTRANSFER => true,
@@ -807,7 +811,7 @@ class Confirmo extends PaymentModule
 
         // if the response contained information about error, then compile the whole error sting and throw new exception
         if (is_string($error)) {
-            $error = "BitcoinPay Beta: " . ($error ?: "Unknown API error.");
+            $error = "Confirmo: " . ($error ?: "Unknown API error.");
         } else {
             if (defined('JSON_PRETTY_PRINT')) {
                 $error = json_encode($error, JSON_PRETTY_PRINT);
@@ -911,10 +915,10 @@ class Confirmo extends PaymentModule
      */
     public function checkCallbackPassword($callback)
     {
-        // check callback passwork if it has been set
+        // check callback password if it has been set
         $callbackPassword = $this->getConfigValue('CALLBACK_PASSWORD');
         if ($callbackPassword) {
-            if (!isset($_SERVER['HTTP_CALLBACKSIGNATURE']) || $_SERVER['HTTP_CALLBACKSIGNATURE'] != hash('sha256', $callback . $callbackPassword)) {
+            if (!isset($_SERVER['HTTP_BP_SIGNATURE']) || $_SERVER['HTTP_BP_SIGNATURE'] != hash('sha256', $callback . $callbackPassword)) {
                 return false;
             }
         }
@@ -959,17 +963,16 @@ class Confirmo extends PaymentModule
     /**
      * Extracts enabled settlement currencies from the API response object.
      *
-     * @param array $settlementCurrencies response object from the API
+     * @param array $settlementMethods response object from the API
      *
      * @return array array of enabled settlement currency codes
      */
-    private function extractEnabledSettlementCurrencies($settlementCurrencies)
+    private function extractEnabledSettlementCurrencies($settlementMethods)
     {
         $currencies = array();
-        foreach ($settlementCurrencies as $currency) {
-            // TODO: Check if the currency is enabled - API missing
-            //if (!$currency->enabled)
-                $currencies[] = $currency->code;
+        foreach ($settlementMethods as $currency) {
+            if ($currency->active)
+                $currencies[] = $currency->currency;
         }
         return $currencies;
     }

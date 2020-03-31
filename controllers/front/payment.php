@@ -71,7 +71,7 @@ class ConfirmoPaymentModuleFrontController extends ModuleFrontController
             if (!empty($response->url)) {
                 Tools::redirect($response->url);
             } else {
-                $this->displayError("Failed to retrieve BitcoinPay Beta payment URL.");
+                $this->displayError("Failed to retrieve Confirmo payment URL.");
             }
         } catch (Exception $e) {
             $this->displayError($e->getMessage());
@@ -86,7 +86,7 @@ class ConfirmoPaymentModuleFrontController extends ModuleFrontController
     public function displayError($errorMessage)
     {
         // display payment request error page
-        $heading = $this->module->l("BitcoinPay Beta Error");
+        $heading = $this->module->l("Confirmo Error");
         if (isset($this->context->smarty->tpl_vars['meta_title'])) {
             $meta_title = $heading . ' - ' . $this->context->smarty->tpl_vars['meta_title']->value;
         } else {
